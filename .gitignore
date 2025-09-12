@@ -1,1 +1,5 @@
 /.idea/.name
+.venv
+.idea
+.kattisrc
+venv
