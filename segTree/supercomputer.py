@@ -21,7 +21,7 @@ def flip(i):
     affected = {root}
     x = root
     while x.end != i or x.start != i:
-        mid = mid = math.floor((x.start + x.end) / 2)
+        mid = math.floor((x.start + x.end) / 2)
         if i <= mid:
             affected.add(x.l)
             x = x.l
