@@ -7,7 +7,7 @@ for _ in range(m):
     G.addEdge(u, v, w)
 G.calc(s, t)
 cut = G.retrieveCut()
-verts = set([x[0] for x in cut])
+verts = [x for x in range(n) if G.leftOfMinCut(x)]
 print(len(verts))
 for ve in verts:
     print(ve)
