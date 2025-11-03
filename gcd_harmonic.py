@@ -48,29 +48,18 @@ def solve_tree_dp(n, values, adj):
     root = 1
     
     # Generate candidate values to try
-    # We'll try: original values, and small multiples/values that might work
+    # Strategy: we only need small values since cost = value
+    # The optimal solution will use small values
     candidate_set = set()
     
-    # Add all original values
+    # Add all original values (keeping them has cost 0)
     for v in values[1:]:
         candidate_set.add(v)
     
-    # Add small values that might be good (cheap options)
-    for v in range(2, 101):  # Small values are cheap
+    # Add small values (they are cheap and versatile)
+    # Most solutions will use values <= 100
+    for v in range(2, 51):  # Focus on really small values
         candidate_set.add(v)
-    
-    # Add factors and multiples of original values
-    for v in values[1:]:
-        # Add small multiples
-        for mult in range(1, 4):
-            if v * mult <= 10000:
-                candidate_set.add(v * mult)
-        # Add factors
-        for d in range(2, min(v, 101)):
-            if v % d == 0:
-                candidate_set.add(d)
-                if v // d <= 10000:
-                    candidate_set.add(v // d)
     
     candidates = sorted(candidate_set)
     
