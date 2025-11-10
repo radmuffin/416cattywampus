@@ -3,3 +3,6 @@
 .idea
 .kattisrc
 venv
+
+# Generated test files
+test_*.txt
