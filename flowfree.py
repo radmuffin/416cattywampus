@@ -154,6 +154,18 @@ def connect_color(grid, size, start, end, color, colors, color_list, filled_coun
     # DFS to find path from start to end
     def dfs(i, j, path):
         if (i, j) == end:
+            # Only count the path cells (excluding endpoints which are already counted)
+            new_filled = filled_count + (len(path) - 2)
+            total_cells = size * size
+            
+            # Check if this is the last color
+            next_idx = color_list.index(color) + 1
+            is_last_color = next_idx >= len(color_list)
+            
+            # If this is the last color, we must fill all remaining cells
+            if is_last_color and new_filled != total_cells:
+                return False
+            
             # Found the endpoint, mark the path
             for pi, pj in path[1:-1]:  # Exclude endpoints
                 grid[pi][pj] = color.lower()
@@ -162,11 +174,7 @@ def connect_color(grid, size, start, end, color, colors, color_list, filled_coun
             grid[si][sj] = color.upper()
             grid[ei][ej] = color.upper()
             
-            new_filled = filled_count + len(path)
-            
             # Try to solve rest of puzzle
-            next_idx = color_list.index(color) + 1
-            
             if solve(grid, size, colors, next_idx, color_list, new_filled):
                 return True
             
