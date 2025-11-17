@@ -1,4 +1,4 @@
-3
-a..
-...
-..a
+RGBW
+WWWW
+RGBY
+YWWW

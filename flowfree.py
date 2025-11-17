@@ -4,6 +4,11 @@ Flow Free Puzzle Solver with Pruning
 Solves Flow Free puzzles using backtracking with pruning optimizations.
 """
 
+def is_blank(cell):
+    """Check if a cell is blank (empty)."""
+    return cell == '.' or cell == 'W'
+
+
 def parse_input():
     """Parse input and return grid size and color endpoints."""
     # Read first line - could be size or first row of grid
@@ -23,15 +28,15 @@ def parse_input():
         for _ in range(size - 1):
             grid.append(list(input().strip()))
     
-    # Find all color endpoints
+    # Find all color endpoints (. and W are blank cells)
     colors = {}
     for i in range(size):
         for j in range(size):
-            if grid[i][j] != '.':
-                color = grid[i][j]
-                if color not in colors:
-                    colors[color] = []
-                colors[color].append((i, j))
+            cell = grid[i][j]
+            if cell != '.' and cell != 'W':
+                if cell not in colors:
+                    colors[cell] = []
+                colors[cell].append((i, j))
     
     return size, grid, colors
 
@@ -49,12 +54,12 @@ def pruneWorthy(grid, size, colors, filled_count):
     # Check for isolated cells or unreachable regions
     for i in range(size):
         for j in range(size):
-            if grid[i][j] == '.':
+            if is_blank(grid[i][j]):
                 # Check if this empty cell has at least one valid neighbor
                 neighbors = get_neighbors(i, j, size)
                 has_valid_neighbor = False
                 for ni, nj in neighbors:
-                    if grid[ni][nj] == '.' or grid[ni][nj].islower():
+                    if is_blank(grid[ni][nj]) or grid[ni][nj].islower():
                         has_valid_neighbor = True
                         break
                 
@@ -100,7 +105,7 @@ def is_reachable(grid, size, start, end, color):
             
             cell = grid[ni][nj]
             # Can move to empty cells or cells with our color (including endpoint)
-            if cell == '.' or cell == color or cell == color.lower():
+            if is_blank(cell) or cell == color or cell == color.lower():
                 if (ni, nj) == end:
                     return True
                 visited.add((ni, nj))
@@ -163,8 +168,12 @@ def connect_color(grid, size, start, end, color, colors, color_list, filled_coun
     si, sj = start
     ei, ej = end
     
+    # Save original cell values for backtracking
+    original_start = grid[si][sj]
+    original_end = grid[ei][ej]
+    
     # DFS to find path from start to end
-    def dfs(i, j, path):
+    def dfs(i, j, path, saved_cells):
         if (i, j) == end:
             # Only count the path cells (excluding endpoints which are already counted)
             new_filled = filled_count + (len(path) - 2)
@@ -190,11 +199,11 @@ def connect_color(grid, size, start, end, color, colors, color_list, filled_coun
             if solve(grid, size, colors, next_idx, color_list, new_filled):
                 return True
             
-            # Backtrack
+            # Backtrack - restore original values
             for pi, pj in path[1:-1]:
-                grid[pi][pj] = '.'
-            grid[si][sj] = color
-            grid[ei][ej] = color
+                grid[pi][pj] = saved_cells[(pi, pj)]
+            grid[si][sj] = original_start
+            grid[ei][ej] = original_end
             
             return False
         
@@ -206,22 +215,26 @@ def connect_color(grid, size, start, end, color, colors, color_list, filled_coun
             cell = grid[ni][nj]
             
             # Can move to empty cells or the endpoint
-            if cell == '.' or (ni, nj) == end:
+            if is_blank(cell) or (ni, nj) == end:
                 path.append((ni, nj))
-                if dfs(ni, nj, path):
+                # Save original cell value for backtracking
+                if (ni, nj) != end:
+                    saved_cells[(ni, nj)] = cell
+                if dfs(ni, nj, path, saved_cells):
                     return True
                 path.pop()
         
         return False
     
-    return dfs(si, sj, [start])
+    saved_cells = {}
+    return dfs(si, sj, [start], saved_cells)
 
 
 def main():
     size, grid, colors = parse_input()
     
     # Count initially filled cells (the color endpoints)
-    filled_count = sum(1 for i in range(size) for j in range(size) if grid[i][j] != '.')
+    filled_count = sum(1 for i in range(size) for j in range(size) if not is_blank(grid[i][j]))
     
     color_list = list(colors.keys())
     
