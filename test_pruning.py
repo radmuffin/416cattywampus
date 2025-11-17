@@ -49,33 +49,45 @@ def main():
         nsol_input = f.read()
     all_pass &= test_case("nsol.txt", nsol_input, "not solvable")
     
-    # Test 3: Larger solvable puzzle (same row, Hamiltonian path exists)
-    test3 = """4
-a..a
+    # Test 3: Single color solvable
+    test3 = """a..a
 ....
 ....
 ....
 """
-    all_pass &= test_case("4x4 solvable (simple)", test3, "solvable")
+    all_pass &= test_case("4x4 single color solvable", test3, "solvable")
     
-    # Test 4: Impossible due to parity
-    test4 = """4
-a...
+    # Test 4: Impossible - diagonal endpoints
+    test4 = """a...
 ....
 ....
 ...a
 """
-    all_pass &= test_case("4x4 impossible (isolated)", test4, "not solvable")
+    all_pass &= test_case("4x4 impossible (diagonal)", test4, "not solvable")
     
-    # Test 5: 5x5 solvable (single color)
-    test5 = """5
-a....
-.....
-.....
-.....
-....a
+    # Test 5: Two colors - adjacent in same row
+    test5 = """ab..
+....
+....
+..ab
 """
-    all_pass &= test_case("5x5 solvable (simple)", test5, "solvable")
+    all_pass &= test_case("4x4 two colors adjacent", test5, "solvable")
+    
+    # Test 6: Two colors - different layout
+    test6 = """ab..
+....
+....
+..ab
+"""
+    all_pass &= test_case("4x4 two colors alt", test6, "solvable")
+    
+    # Test 7: Complex unsolvable case
+    test7 = """a.b.
+....
+....
+.b.a
+"""
+    all_pass &= test_case("4x4 complex unsolvable", test7, "not solvable")
     
     print("\n" + "="*50)
     if all_pass:

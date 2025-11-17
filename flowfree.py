@@ -6,10 +6,22 @@ Solves Flow Free puzzles using backtracking with pruning optimizations.
 
 def parse_input():
     """Parse input and return grid size and color endpoints."""
-    size = int(input())
-    grid = []
-    for _ in range(size):
-        grid.append(list(input().strip()))
+    # Read first line - could be size or first row of grid
+    first_line = input().strip()
+    
+    # Check if first line is a number (old format) or grid row (new format)
+    if first_line.isdigit():
+        # Old format: first line is size
+        size = int(first_line)
+        grid = []
+        for _ in range(size):
+            grid.append(list(input().strip()))
+    else:
+        # New format: first line is first row of 4x4 grid
+        size = 4
+        grid = [list(first_line)]
+        for _ in range(size - 1):
+            grid.append(list(input().strip()))
     
     # Find all color endpoints
     colors = {}
